@@ -1,45 +1,4 @@
 
-var CommentForm = React.createClass({
-  getInitialState: function() {
-    return {author: '', text: ''};
-  },
-  handleAuthorChange: function(e) {
-    this.setState({author: e.target.value});
-  },
-  handleTextChange: function(e) {
-    this.setState({text: e.target.value});
-  },
-  handleSubmit: function(e) {
-    e.preventDefault();
-    var author = this.state.author.trim();
-    var text = this.state.text.trim();
-    if (!text || !author) {
-      return;
-    }
-    this.props.onCommentSubmit({author: author, text: text});
-    this.setState({author: '', text: ''});
-  },
-  render: function() {
-    return (
-      <form className="commentForm" onSubmit={this.handleSubmit}>
-        <input
-          type="text"
-          placeholder="Your name____"
-          value={this.state.author}
-          onChange={this.handleAuthorChange}
-        />
-        <input
-          type="text"
-          placeholder="Say something..."
-          value={this.state.text}
-          onChange={this.handleTextChange}
-        />
-        <input type="submit" value="Post" />
-      </form>
-    );
-  }
-});
-
 class InputField extends React.Component{
 	constructor(props){
 		super(props);
@@ -56,34 +15,81 @@ class InputField extends React.Component{
 class UserForm extends React.Component {
 	constructor(props){
 		super(props);
-		this.state = {username : "John"};
+		this.state = {username : "", email:""};
 		this.handleChange = this.handleChange.bind(this);
 	}
 	
 	render() {
       return (
-	    <form onSubmit={this.handleSubmit}>
+	    <form onSubmit={this.handleSubmit.bind(this)} method="POST">
 	      <InputField name="username" value={this.state.username} handleChange={this.handleChange}/>
+		  <InputField name="email" value={this.state.email} handleChange={this.handleChange}/>
 		  <input type="submit" value="Save" />
 	    </form>
 	  );
    }
    
    handleChange(event){
-      console.debug(event.target.name + "::" + event.target.value);
 	  this.setState({[event.target.name] : event.target.value});
-	  console.debug("username:"+ this.state.username);
    }
    
-   handleSubmit(){
-     
+   handleSubmit(e){
+     e.preventDefault();
+     this.props.handleSubmit({username: this.state.username, email: this.state.email})
+     this.setState({username: "", email:""});
    }
 }
 
-class App extends React.Component{
+class UserItem extends React.Component{
 	render() {
-    return <UserForm name="John"/>;
+		return (
+			<tr>
+			  <td>{this.props.user.username}</td>
+			  <td>{this.props.user.email}</td>
+			</tr>
+		);
+	}
+}
+
+class UserList extends React.Component{
+	render() {
+		return (
+		  <table>
+		    <thead>
+		      <tr><th>Username</th><th>Email</th></tr>
+		    </thead>
+		    <tbody>
+             {this.props.users.map(function(user){
+               return <UserItem user={user} key={user.id} />;
+             })}
+			</tbody>
+          </table>
+		);
+	}
+}
+
+class App extends React.Component{
+	constructor(props){
+	   super(props);
+	   this.state = {users: []};
+	}
+	
+	render() {
+		return (
+		   <div>
+			 <UserForm handleSubmit={this.handleSubmit.bind(this)}/>
+			 <UserList users={this.state.users} />
+		   </div>
+		);
   }
+  
+  	handleSubmit(user){
+	 var users = this.state.users;
+	 user.id = Date.now();
+	 console.debug(JSON.stringify(user));
+	 var newUsers = users.concat([user]);
+     this.setState({users: newUsers});
+   }
 }
 
 ReactDOM.render(<App />, document.getElementById('content'));
