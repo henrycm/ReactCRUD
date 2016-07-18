@@ -5,9 +5,32 @@ class InputField extends React.Component{
 	}
 	render() {
 	  return ( 
-	  <div>
-	    {this.props.name}:<input type="text" name={this.props.name} value={this.props.value} onChange={this.props.handleChange.bind(this)} />
-	  </div>
+	    <div className="form-group">
+	        <label className="col-sm-4 control-label">{this.props.name}</label>
+	        <div className="col-sm-8">
+	          <input type="text" 
+	            className="form-control" 
+	            name={this.props.name} 
+	            value={this.props.value} 
+	            onChange={this.props.handleChange.bind(this)} />
+	        </div>
+	    </div>
+	  );
+	}
+}
+
+
+class SubmitButton extends React.Component{
+	constructor(props){
+		super(props);
+	}
+	render() {
+	  return ( 
+          <div className="form-group">
+            <div className="col-sm-offset-4 col-sm-8">
+              <button type="submit" className="btn btn-default">{this.props.name}</button>
+            </div>
+          </div>
 	  );
 	}
 }
@@ -21,10 +44,10 @@ class UserForm extends React.Component {
 	
 	render() {
       return (
-	    <form onSubmit={this.handleSubmit.bind(this)} >
+	    <form className="form-horizontal" onSubmit={this.handleSubmit.bind(this)} >
 	      <InputField name="username" value={this.state.username} handleChange={this.handleChange}/>
 		  <InputField name="email" value={this.state.email} handleChange={this.handleChange}/>
-		  <input type="submit" value="Save" />
+		  <SubmitButton name="Save" />
 	    </form>
 	  );
    }
@@ -50,7 +73,7 @@ class UserItem extends React.Component{
 			<tr>
 			  <td>{this.props.user.username}</td>
 			  <td>{this.props.user.email}</td>
-			  <td><button onClick={this.handleDelete.bind(this)}>X</button></td>
+			  <td><button className="btn btn-default" onClick={this.handleDelete.bind(this)}>X</button></td>
 			</tr>
 		);
 	}
@@ -63,11 +86,13 @@ class UserItem extends React.Component{
 class UserList extends React.Component{
 	render() {
 	let outer = this;
-		return (
-		  <table>
-		    <thead>
-		      <tr><th>Username</th><th>Email</th><th>Action</th></tr>
-		    </thead>
+		return (		
+		  <table className="table">
+		   {this.props.users.length > 0 ? 
+		      <thead>
+		        <tr><th>Username</th><th>Email</th><th>Action</th></tr>
+		      </thead>
+		    : null }
 		    <tbody>
              {this.props.users.map(function(user){
                return <UserItem user={user} key={user.id} handleDelete={outer.props.handleDelete}/>;
@@ -86,9 +111,13 @@ class App extends React.Component{
 	
 	render() {
 		return (
-		   <div>
-			 <UserForm handleSubmit={this.handleSubmit.bind(this)} user={this.state.user}/>
-			 <UserList users={this.state.users} handleDelete={this.handleDelete.bind(this)}/>
+		   <div className="container">
+		     <div className="col-sm-6">
+			     <UserForm handleSubmit={this.handleSubmit.bind(this)} user={this.state.user}/>			    
+			 </div>
+			  <div className="col-sm-6">
+			     <UserList users={this.state.users} handleDelete={this.handleDelete.bind(this)}/>
+			  </div>
 		   </div>
 		);
   }
